@@ -4,12 +4,23 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pruebajvfx.controller.PantallaPrincipal">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: FFEEDB; -fx-border-color: #AF601A;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.pruebajvfx.controller.PantallaPrincipal">
    <children>
-      <Button id="btn_carga_manual" layoutX="347.0" layoutY="14.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="118.0" text="Carga manual" />
-      <Button id="btn_reporte" layoutX="475.0" layoutY="14.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="75.0" text="Reporte" />
-      <Button id="btn_nuevo" layoutX="95.0" layoutY="70.0" mnemonicParsing="false" onAction="#fnBtnNuevo" prefHeight="33.0" prefWidth="75.0" text="Nuevo" />
+      <Button id="btn_carga_manual" fx:id="btnCargaCSV" layoutX="347.0" layoutY="14.0" mnemonicParsing="false" onAction="#fnCargaCSV" prefHeight="33.0" prefWidth="118.0" style="-fx-background-color: FFEEDB; -fx-border-color: #AF601A;" text="Carga manual" textFill="#da4321">
+         <font>
+            <Font name="Tempus Sans ITC" size="15.0" />
+         </font></Button>
+      <Button id="btn_reporte" fx:id="btnReporte" layoutX="475.0" layoutY="14.0" mnemonicParsing="false" onAction="#btnReporteOnClick" prefHeight="33.0" prefWidth="75.0" style="-fx-background-color: FFEEDB; -fx-border-color: #AF601A;" text="Reporte" textFill="#da4321">
+         <font>
+            <Font name="Tempus Sans ITC" size="15.0" />
+         </font></Button>
+      <Button id="btn_nuevo" layoutX="95.0" layoutY="70.0" mnemonicParsing="false" onAction="#fnBtnNuevo" prefHeight="33.0" prefWidth="75.0" style="-fx-background-color: FFEEDB; -fx-border-color: #AF601A;" text="Nuevo" textFill="#da4321">
+         <font>
+            <Font name="Tempus Sans ITC" size="15.0" />
+         </font></Button>
       <TableView id="tbListado" fx:id="tbDatos" layoutX="62.0" layoutY="137.0" prefHeight="200.0" prefWidth="489.0">
         <columns>
             <TableColumn id="colPromedio" fx:id="colPromedio" prefWidth="88.0" text="Promedio" />
@@ -18,5 +29,6 @@
             <TableColumn fx:id="colProyecto" prefWidth="123.0" text="Proyecto" />
         </columns>
       </TableView>
+      <Text fx:id="txtMensaje" layoutX="172.0" layoutY="369.0" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="268.13671875" />
    </children>
 </Pane>

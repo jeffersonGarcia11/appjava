@@ -2,6 +2,8 @@ package com.pruebajvfx.controller;
 
 import java.io.IOException;
 
+import com.pruebajvfx.models.EstudianteNodo;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
@@ -14,12 +16,18 @@ public class PantallaFormulario {
     @FXML
     private Button btnAccion; 
     @FXML
+    private Button btnEliminar; 
+    @FXML
     private TextField txtNombre, txtCarrera, txtProyecto, txtPromedio;
     @FXML
     private Text lbTitle;
 
+    @FXML
+    private Text txtAlerta;
     private String nombre, carrera, proyecto;
     private double promedio;
+    private boolean esEdicion = false;
+    private int posicion;
 
     private PantallaPrincipal pantallaPrincipalController;
 
@@ -31,19 +39,67 @@ public class PantallaFormulario {
     }
 
     @FXML
-    private void btnGuardarOnClick() throws IOException{
-        System.out.println("Se presiono el botón de guardar");
-
+    private void btnEliminarOnClick() throws IOException{
+        System.out.println("Se presiono el botón de eliminar");
+        EstudianteNodo nodo = new EstudianteNodo();
+                nodo.setCarrera(txtCarrera.getText());
+                nodo.setNombre(txtNombre.getText());
+                nodo.setPromedio( Double.parseDouble(txtPromedio.getText()));
+                nodo.setProyecto(txtProyecto.getText());
+                pantallaPrincipalController.eliminarRegistro(posicion);;
+                Stage stage = (Stage) btnAccion.getScene().getWindow();
+                stage.close();
         //valoresCaptura();        
         
-        devolverDatos();
-        Stage stage = (Stage) btnAccion.getScene().getWindow();
-        stage.close();
+        
+    }
+    
+
+    @FXML
+    private void btnGuardarOnClick() throws IOException{
+
+        if(esEdicion){
+            //SI ES EDICION
+            if(casillasLlenas()){
+                if(valoresCaptura()){
+                    EstudianteNodo nodo = new EstudianteNodo();
+                    nodo.setCarrera(txtCarrera.getText());
+                    nodo.setNombre(txtNombre.getText());
+                    nodo.setPromedio( Double.parseDouble(txtPromedio.getText()));
+                    nodo.setProyecto(txtProyecto.getText());
+                    pantallaPrincipalController.edicionRegistro(nodo, posicion);
+                    Stage stage = (Stage) btnAccion.getScene().getWindow();
+                    stage.close();
+                }            
+            }
+        }else{ // NO ES EDICION
+            System.out.println("Se presiono el botón de guardar");
+            devolverDatos();
+        }
     }
 
     public void devolverDatos(){
-        String info = "Info proveniente de PFormulario";
-        pantallaPrincipalController.recibirInformacion(info);
+        if(casillasLlenas()){
+            if(valoresCaptura()){
+                EstudianteNodo nodo = new EstudianteNodo();
+                nodo.setCarrera(txtCarrera.getText());
+                nodo.setNombre(txtNombre.getText());
+                nodo.setPromedio( Double.parseDouble(txtPromedio.getText()));
+                nodo.setProyecto(txtProyecto.getText());
+                pantallaPrincipalController.recibirInformacion(nodo);
+                Stage stage = (Stage) btnAccion.getScene().getWindow();
+                stage.close();
+            }
+        }
+    }
+
+    private boolean casillasLlenas(){
+        if(txtCarrera.getText() == "" ||txtCarrera.getText().isEmpty() || txtNombre.getText().isEmpty() || txtNombre.getText().isEmpty()|| txtPromedio.getText().isEmpty() ){
+                txtAlerta.setText("Llene todos los campos");
+                return false;
+            }
+        
+        return true;
     }
 
     @FXML
@@ -54,25 +110,36 @@ public class PantallaFormulario {
     }
 
     //Se capturan los valores de los inputs que se presentan
-    private void valoresCaptura() throws IOException{
+    private boolean valoresCaptura(){
         nombre = txtNombre.getText();
         carrera = txtCarrera.getText();
         proyecto = txtProyecto.getText();
         try{
             promedio = Double.parseDouble(txtPromedio.getText());
+            return true;
         }catch(NumberFormatException ex){
-            System.err.println(" Error en el ingreso de datos");
+            txtAlerta.setText("Valide valor Promedio (Double)");   
+            return false;
         }
-        lbTitle.setText(nombre + " " + carrera + " " +proyecto + " " + promedio);
-        System.out.println("Nombre " + nombre);
-        System.out.println(" Carrera" +  carrera);
-        System.out.println(" Proyecto " +  proyecto);
-        System.out.println(" Promedio " + promedio);
     }
 
     public void mostrarInformacion(String informacion) {
-        System.out.println("Información recibida...  " + informacion);
-        this.informacion.set(informacion);
+        lbTitle.setText("NUEVO");
+        btnAccion.setText("Guardar");
+        btnEliminar.setVisible(false);
+        //btnEliminar.setManaged(false);
+    }
+
+    public void mostrarInformacionEdicion(EstudianteNodo nodo, int posicion) {
+        this.posicion = posicion;
+        esEdicion = true;
+        lbTitle.setText("EDICION");
+        btnAccion.setText("EDITAR");
+        txtNombre.setText(nodo.getNombre());
+        txtCarrera.setText(nodo.getCarrera());
+        txtProyecto.setText(nodo.getProyecto());
+        txtPromedio.setText(String.valueOf(nodo.getPromedio()) );
+        
     }
 
     
