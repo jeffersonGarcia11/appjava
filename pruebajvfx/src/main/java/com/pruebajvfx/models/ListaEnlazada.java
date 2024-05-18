@@ -87,8 +87,8 @@ public class ListaEnlazada {
     }
 
     public String ordenAgregar(EstudianteNodo nodo){
-        Double nodoPromedio = nodo.getPromedio();
-        if(nodoInicial == null){
+        Double nodoPromedioNuevo = nodo.getPromedio();
+        if(this.nodoInicial == null){
             //Validación si es el primer nodo en guardarse
             guardarNodo(nodo, 1);
         }else{
@@ -100,33 +100,58 @@ public class ListaEnlazada {
                 return "";
             }else if( nodoIni.getEnlace() == nodoFinal){
                 //Caso donde solamente existen dos nodos registrados
-                if(nodoPromedio < nodoFinal.getPromedio()){
+                if(nodoPromedioNuevo < nodoFinal.getPromedio()){
                     //Validación si el promedio es menor que el promedio del segundo nodo
                     guardarNodo(nodo, 2);
-                }else{
+                }else{ //Guardado de nodo al final si solamente existen 2 nodos registrados previamente
                     guardarNodo(nodo, 3);
                 }
                 return "";
-            }
-            //Caso si hay más de dos nodos registrados (hasta n nodos)
-            int contador = 0;
-            EstudianteNodo nodoActual = nodoIni;
-            while(nodoIni != null && contador < cantidad){
-                nodoActual = nodoActual.getEnlace();
-                contador++;
-                if(nodoActual.getPromedio() < nodoPromedio){
-                    guardarNodo(nodo, contador); //POSIBLEMENTE SUMAR 1
-                    return "";
+            }else{
+                /*
+                for(int i = 0; i<cantidad; i++){
+                    System.out.println("vuelta No. " + i);
+                    EstudianteNodo nodoEstuEvaluar = getNodoEnPosicion(i);
+                    Double promedioEvaluar = nodoEstuEvaluar.getPromedio();
+                    if(nodoPromedioNuevo < promedioEvaluar){
+                        guardarNodo(nodo, i++);
+                    }else if(nodoPromedioNuevo == promedioEvaluar){
+                        guardarNodo(nodo, i++);
+                    }
+                    System.out.println("Valor de nombre de nodo " + nodoEstuEvaluar.getPromedio());
+                    
+                }
+                */
+                boolean guardado = false;
+                int i = 0; 
+                while(guardado == false){
+
+                    EstudianteNodo nodoEstuEvaluar = getNodoEnPosicion(i);
+                    Double promedioEvaluar = nodoEstuEvaluar.getPromedio();
+                    if(nodoPromedioNuevo < promedioEvaluar){
+                        guardarNodo(nodo, i++);
+                        guardado = true;
+                    }else if(nodoPromedioNuevo == promedioEvaluar){
+                        guardarNodo(nodo, i++);
+                        guardado = true;
+                    }
+                    System.out.println("Valor de nombre de nodo " + nodoEstuEvaluar.getPromedio());
+                    i++;
+                }
+                if(guardado == false){
+                    //Guardará en ultima poscision el nodo si no encuentra 
+                    guardarNodo(nodo, cantidad++);
                 }
             }
-
+            //Caso si hay más de dos nodos registrados (hasta n nodos)
             //Si no es menor a ninguno indica que debe de ir de ultimo
             guardarNodo(nodo, cantidad +1);
             return "";
         }
-        
-
-
         return "";
     }
+
+    // Para editar, evaluar primero hay que comparar si se cambió el valor del promedio, si no, solamente pedir la posición y editar el nodo
+    // de lo contrario eliminar por la posición y luego agregar el nuevo. 
+    //Para manipular data, la info se encuentra en el otro proyecto
 }

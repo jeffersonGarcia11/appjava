@@ -1,31 +1,39 @@
 package com.pruebajvfx.controller;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import com.pruebajvfx.App;
 import com.pruebajvfx.models.EstudianteNodo;
 import com.pruebajvfx.models.ListaEnlazada;
-
+import java.io.File;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.text.Text;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class PantallaPrincipal {
     @FXML
     private Button btn_nuevo;
 
+    @FXML
+    private Button btnReporte;
     @FXML 
     private TableView<EstudianteNodo> tbDatos;
     @FXML 
@@ -37,10 +45,58 @@ public class PantallaPrincipal {
     @FXML
     private TableColumn<EstudianteNodo, String> colProyecto; 
 
+    @FXML
+    private Text txtMensaje;
     private ObservableList<EstudianteNodo> data;
     private ListaEnlazada listaEnlazada = new ListaEnlazada(); 
 
+    @FXML
+    private void btnReporteOnClick(ActionEvent event) throws IOException{
+        System.out.println("Se presionó el botón de reporte");
+        generatePrueba();
+    }
 
+    @FXML
+    private void fnCargaCSV(){
+        System.out.println("Se presiono el btn de Carga manual");
+        prevalidacionCargaCSV();
+    }
+
+    @FXML
+    private void generatePrueba(){
+        Stage primaryStage = (Stage) btnReporte.getScene().getWindow(); // Obtener el escenario actual desde la aplicación
+        primaryStage.setTitle("CSV File Writer");
+        
+        // Seleccionar la ubicación y el nombre del archivo donde guardar los datos
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save CSV File");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv"));
+        File selectedFile = fileChooser.showSaveDialog(primaryStage);
+
+        if (selectedFile != null) {
+            try {
+                // Crear un BufferedWriter para escribir en el archivo seleccionado
+                BufferedWriter writer = new BufferedWriter(new FileWriter(selectedFile));
+
+                // Escribir los datos en el archivo CSV
+
+                for(int i = 0; i< listaEnlazada.getCantidad(); i++){
+                    EstudianteNodo nodoN = listaEnlazada.getNodoEnPosicion(i);
+                    System.out.println("Nodo nombre" + nodoN.getNombre());
+                    writer.write("" + nodoN.getNombre() ); //Pendiente de agregar los demas datos
+                    writer.newLine();
+                }
+                // Cerrar el BufferedWriter después de escribir en el archivo
+                writer.close();
+
+                System.out.println("Archivo CSV guardado correctamente.");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("No se ha seleccionado ningún archivo para guardar.");
+        }
+    }
 
     @FXML
     private void fnBtnNuevo(ActionEvent event) throws IOException{ // se agrega IOException para el lanzamiento de la nueva pantalla 
@@ -59,61 +115,11 @@ public class PantallaPrincipal {
         stage.show();
     }
 
-    private static Parent loadFXML2(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
-        return fxmlLoader.load();
-    }
-
-     //Metodo para poder llamar a otra pantalla. 
-    private static PantallaFormulario loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
-        Parent root = fxmlLoader.load();
-        PantallaFormulario controller = fxmlLoader.getController(); // Obtener el controlador de PantallaFormulario
-        return controller;
-    }
-
-
-
-    /**
-     * 
-        //@FXML
-    private void fnBtnNuevo(ActionEvent event) throws IOException{ // se agrega IOException para el lanzamiento de la nueva pantalla 
-        StringProperty informacion = new SimpleStringProperty();
-        informacion.set("Nuevo");
-        System.out.println("Se presiono el botón nuevo");
-        Scene scene = new Scene(loadFXML("pantalla_formulario"), 640, 480);
-        Stage stage = new Stage(); 
-        stage.setScene(scene);
-        stage.show();
-    }
-
-     //Metodo para poder llamar a otra pantalla. 
-     private static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
-        return fxmlLoader.load();
-    }
-
-
-
-     */
-
-
     
 
     @FXML 
     private void initialize() {
         data = FXCollections.observableArrayList();
-        /**
-        
-        EstudianteNodo estudiante = new EstudianteNodo();
-        EstudianteNodo estudiante2 = new EstudianteNodo();
-        estudiante.setNombre("Prueba");
-        estudiante2.setNombre("Jualian Alvarez");
-        data.add(estudiante);
-        data.add(estudiante2);
-        System.out.println("Se carga la pantalla, se ejecuta el initizlize");
-        System.out.println("Datos a imprimir " + estudiante.getNombre());
-         */
         colNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         colPromedio.setCellValueFactory(new PropertyValueFactory<>("promedio"));
         colCarrera.setCellValueFactory(new PropertyValueFactory<>("carrera"));
@@ -126,7 +132,6 @@ public class PantallaPrincipal {
    
     //Cargar datos de ListaEnlazada a data de 
     private void conversionData(){
-        System.out.println("Ingresa a la función");
         EstudianteNodo estudiante = new EstudianteNodo();
         estudiante.setNombre("Juan Ramon");      
         EstudianteNodo estudiante2 = new EstudianteNodo();
@@ -148,5 +153,272 @@ public class PantallaPrincipal {
 
     public void recibirInformacion(String recibirInfo){
         System.out.println("Se recibe la info: " + recibirInfo);
+    }
+
+    @FXML
+    public void generarReporteCSV(){
+        Stage primaryStage = (Stage) btn_nuevo.getScene().getWindow(); // Obtener el escenario actual desde la aplicación
+
+        primaryStage.setTitle("CSV File Writer");
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save CSV File");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV files (*.csv)", "*.csv"));
+        File selectedFile = fileChooser.showSaveDialog(primaryStage);
+
+        if (selectedFile != null) {
+            try {
+                // Crear un BufferedWriter para escribir en el archivo seleccionado
+                BufferedWriter writer = new BufferedWriter(new FileWriter(selectedFile));
+
+                // Escribir los datos en el archivo CSV
+                int cantidad = listaEnlazada.getCantidad();
+                for(int i = 0; i<cantidad; i++){
+                    System.out.println("vuelta No. " + i);
+                    EstudianteNodo nodo = listaEnlazada.getNodoEnPosicion(i);
+                    //System.out.println("Valor de nombre de nodo " + nodo.getNombre());
+                    
+                }
+                // Cerrar el BufferedWriter después de escribir en el archivo
+                writer.close();
+
+                System.out.println("Archivo CSV guardado correctamente.");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("No se ha seleccionado ningún archivo para guardar.");
+        }
+    }
+    
+    
+    @FXML
+    private void prevalidacionCargaCSV(){
+        //FORMATO DE CARGA 
+        // PROMEDIO, NOMBRE, CARRERA, PROYECTO;
+        Stage primaryStage = (Stage) btnReporte.getScene().getWindow(); // Obtener el escenario actual desde la aplicación
+         primaryStage.setTitle("CSV File Reader");
+
+        // Seleccionar un archivo CSV
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open CSV File");
+        File selectedFile = fileChooser.showOpenDialog(primaryStage);
+        boolean archivoValidado = true;
+        if (selectedFile != null) {
+            try {
+                // Crear un BufferedReader para leer el archivo
+                BufferedReader reader = new BufferedReader(new FileReader(selectedFile));
+                String line;
+                
+                // Leer cada línea del archivo
+                while ((line = reader.readLine()) != null && archivoValidado) {
+                    // Procesar la línea como desees
+                    //System.out.println("Línea leída: " + line);
+                    archivoValidado =  lecturaLinea(line);
+                    System.out.println("Linea "+ line );
+                    System.out.println("Retorno valor " + archivoValidado);
+                }
+                if(archivoValidado == false ){
+                    txtMensaje.setText("VALIDE EL ARCHIVO CARGADO");
+                }else{
+                    BufferedReader reader2 = new BufferedReader(new FileReader(selectedFile));
+                    String line2;
+                    while ((line2 = reader2.readLine()) != null) {
+                        // Procesar la línea como desees
+                        //System.out.println("Línea leída: " + line);
+                        //archivoValidado =  lecturaLinea(line);
+                        EstudianteNodo nodoReturn = guardadoCSV(line2);
+                        System.out.println("Pro " + nodoReturn.getPromedio());
+                        System.out.println("Nombre " + nodoReturn.getNombre());
+                        System.out.println(" Carr " + nodoReturn.getCarrera());
+                        System.out.println(" Proye "+ nodoReturn.getProyecto() );
+                        //System.out.println("Linea "+ line );
+                        //System.out.println("Retorno valor " + archivoValidado);
+                    }
+                    
+                    txtMensaje.setText("Archivo exitosamente cargado");
+                }
+                // Cerrar el BufferedReader después de terminar de leer el archivo
+                reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println("No se seleccionó ningún archivo CSV.");
+        }
+    }
+
+    
+
+    private boolean conversionDouble (String numero){
+        if(numero == null || numero.isEmpty()){
+            return false;
+        }
+        try{
+            Double.parseDouble(numero);
+            return true;
+        }catch (NumberFormatException nerror){
+            return false;
+        }
+    }
+
+    private boolean lecturaLinea(String line){
+        StringBuilder currentField = new StringBuilder();
+        boolean insideQuote = false;
+        boolean todoCorrecto = true;
+        int fieldCount = 0;
+        int i = 0;
+
+        // Primero contar los campos para validar
+        int actualFieldCount = 0;
+        boolean insideQuoteTemp = false;
+        for (int j = 0; j < line.length(); j++) {
+            char currentChar = line.charAt(j);
+
+            if (currentChar == '"') {
+                insideQuoteTemp = !insideQuoteTemp; // Toggle the insideQuote flag
+            } else if (currentChar == ',' && !insideQuoteTemp) {
+                actualFieldCount++;
+            }
+        }
+        actualFieldCount++; // Adding the last field after the last comma
+
+        if (actualFieldCount < 4) {
+            System.out.println("Datos incompletos en la línea: " + line);
+            return false;
+        }
+
+        // Procesar solo los primeros cuatro campos
+        while (i < line.length() && fieldCount < 4) {
+            char currentChar = line.charAt(i);
+
+            if (currentChar == '"') {
+                insideQuote = !insideQuote; // Toggle the insideQuote flag
+            } else if (currentChar == ',' && !insideQuote) {
+                // Encontramos una coma fuera de comillas, entonces este es el final de un campo
+                if (fieldCount == 0) {
+                    // Llamar a la función de validación para el primer campo
+                    boolean datoNumerico = conversionDouble(currentField.toString());
+                    if(datoNumerico == false){
+                        todoCorrecto = false;
+                    }
+                }
+                System.out.println("Campo: " + currentField.toString());
+                currentField.setLength(0); // Limpiar el StringBuilder para el próximo campo
+                fieldCount++;
+            } else {
+                currentField.append(currentChar); // Añadir el carácter al campo actual
+            }
+
+            i++;
+        }
+
+        // Agregar el último campo si es el cuarto
+        if (fieldCount < 4) {
+            if (fieldCount == 0) {
+                // Llamar a la función de validación para el primer campo
+                boolean datoNumerico = conversionDouble(currentField.toString());
+                    if(datoNumerico == false){
+                        todoCorrecto = false;
+                    }
+            }
+            System.out.println("Campo: " + currentField.toString());
+        }
+        return todoCorrecto;
+    }
+
+    private EstudianteNodo guardadoCSV(String line){
+        StringBuilder currentField = new StringBuilder();
+        boolean insideQuote = false;
+        int fieldCount = 0;
+        int i = 0;
+
+        EstudianteNodo nodoSave = new EstudianteNodo();
+        // Primero contar los campos para validar
+        int actualFieldCount = 0;
+        boolean insideQuoteTemp = false;
+        for (int j = 0; j < line.length(); j++) {
+            char currentChar = line.charAt(j);
+
+            if (currentChar == '"') {
+                insideQuoteTemp = !insideQuoteTemp; // Toggle the insideQuote flag
+            } else if (currentChar == ',' && !insideQuoteTemp) {
+                actualFieldCount++;
+            }
+        }
+        actualFieldCount++; // Adding the last field after the last comma
+
+
+        // Procesar solo los primeros cuatro campos
+        while (i < line.length() && fieldCount < 4) {
+            char currentChar = line.charAt(i);
+
+            if (currentChar == '"') {
+                insideQuote = !insideQuote; // Toggle the insideQuote flag
+            } else if (currentChar == ',' && !insideQuote) {
+                // Encontramos una coma fuera de comillas, entonces este es el final de un campo
+                switch (fieldCount) {
+                    case 0:
+                        nodoSave.setPromedio( Double.parseDouble(currentField.toString()));
+                        
+                        break;
+                    case 1:
+                        nodoSave.setNombre(currentField.toString());
+
+                        break;
+                    case 2:
+                        nodoSave.setCarrera(currentField.toString());
+                        break;
+                    case 3:
+                    
+                        nodoSave.setProyecto(currentField.toString());
+                        break;
+                }
+                //System.out.println("Campo: " + currentField.toString());
+                currentField.setLength(0); // Limpiar el StringBuilder para el próximo campo
+                fieldCount++;
+            } else {
+                currentField.append(currentChar); // Añadir el carácter al campo actual
+            }
+
+            i++;
+        }
+
+        // Agregar el último campo si es el cuarto
+        if (fieldCount < 4) {
+            switch (fieldCount) {
+                case 0:
+                nodoSave.setPromedio( Double.parseDouble(currentField.toString()));
+                
+                break;
+                case 1:
+                    nodoSave.setNombre(currentField.toString());
+
+                    break;
+                case 2:
+                    nodoSave.setCarrera(currentField.toString());
+                    break;
+                case 3:
+                
+                    nodoSave.setProyecto(currentField.toString());
+                    break;
+            }
+            //System.out.println("Campo segundo proceso: " + currentField.toString());
+        }
+        return nodoSave;
+    }
+
+
+    private static Parent loadFXML2(String fxml) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
+        return fxmlLoader.load();
+    }
+
+     //Metodo para poder llamar a otra pantalla. 
+    private static PantallaFormulario loadFXML(String fxml) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
+        Parent root = fxmlLoader.load();
+        PantallaFormulario controller = fxmlLoader.getController(); // Obtener el controlador de PantallaFormulario
+        return controller;
     }
 }
